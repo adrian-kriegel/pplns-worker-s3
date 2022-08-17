@@ -1,17 +1,17 @@
 
 import type { S3CreateEvent } from 'aws-lambda';
 
-import Minio from 'minio';
+import { S3 } from 'aws-sdk';
 
 import type WorkerS3 from './workers3';
 
 import { PipelineNode } from '@pplns/node-sdk';
+import { listAllObjects } from './s3-util';
 
-const s3 = new Minio.Client(
+const s3 = new S3(
   {
-    endPoint: 's3.amazonaws.com',
-    accessKey: process.env.AWS_S3_ACCESS_KEY_ID as string,
-    secretKey: process.env.AWS_S3_ACCESS_KEY as string,
+    accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID as string,
+    secretAccessKey: process.env.AWS_S3_ACCESS_KEY as string,
   },
 );
 
@@ -33,17 +33,17 @@ export default class NodeS3
    * @param s3obj bucket item
    * @returns s3 key
    */
-  getKey(s3obj : Minio.BucketItem)
+  getKey(s3obj : any)
   {
     return s3obj.prefix + s3obj.name;
   }
 
   /**
-   * @param param0 s3 object with key and etag
+   * @param key s3 object key
    * @returns Promise
    */
   emitS3Object(
-    { key } : { eTag: string, key: string },
+    key : string,
   )
   {
     return this.emit(
@@ -61,24 +61,11 @@ export default class NodeS3
   /** @returns Promise<void> */
   run()
   {
-    return new Promise<void>((resolve, reject) => 
-    {
-      const listObjects = s3.listObjectsV2(this.param('bucket'));
-
-      listObjects.on(
-        'data',
-        (s3obj) => this.emitS3Object(
-          {
-            eTag: s3obj.etag,
-            key: this.getKey(s3obj),
-          },
-        ),
-      );
-
-      listObjects.on('error', reject);
-
-      listObjects.on('close', () => resolve());
-    });
+    return listAllObjects(
+      s3, 
+      { Bucket: this.param('bucket') },
+      (obj) => obj.Key && this.emitS3Object(obj.Key),
+    );
   }
 
   /**
@@ -89,7 +76,7 @@ export default class NodeS3
   {
     return Promise.all(
       e.Records.map(
-        (r) => this.emitS3Object(r.s3.object),
+        ({ s3 }) => this.emitS3Object(s3.object.key),
       ),
     );
   }
