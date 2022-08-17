@@ -30,15 +30,6 @@ export default class NodeS3
   }
 
   /**
-   * @param s3obj bucket item
-   * @returns s3 key
-   */
-  getKey(s3obj : any)
-  {
-    return s3obj.prefix + s3obj.name;
-  }
-
-  /**
    * @param key s3 object key
    * @returns Promise
    */
@@ -61,9 +52,11 @@ export default class NodeS3
   /** @returns Promise<void> */
   run()
   {
+    const bucket = this.param('bucket');
+
     return listAllObjects(
       s3, 
-      { Bucket: this.param('bucket') },
+      { Bucket: bucket },
       (obj) => obj.Key && this.emitS3Object(obj.Key),
     );
   }
