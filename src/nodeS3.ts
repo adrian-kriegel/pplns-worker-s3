@@ -26,7 +26,7 @@ export default class NodeS3
    */
   getUrl(key : string)
   {
-    return this.param('bucket') + '/' + key;
+    return `https://${this.param('bucket')}.s3.amazonaws.com/${key}`;
   }
 
   /**
