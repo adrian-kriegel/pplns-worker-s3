@@ -3,7 +3,7 @@ require('dotenv').config();
 
 import PipelineApi from '@pplns/node-sdk';
 
-import S3Worker from './workers3';
+import S3Worker from './worker-s3';
 import NodeS3 from './nodeS3';
 
 const pipes = new PipelineApi(

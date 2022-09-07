@@ -3,7 +3,7 @@ import type { S3CreateEvent } from 'aws-lambda';
 
 import { S3 } from 'aws-sdk';
 
-import type WorkerS3 from './workers3';
+import type WorkerS3 from './worker-s3';
 
 import { PipelineNode } from '@pplns/node-sdk';
 import { listAllObjects } from './s3-util';

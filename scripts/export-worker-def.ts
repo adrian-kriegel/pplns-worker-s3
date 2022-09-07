@@ -5,7 +5,7 @@
 
 import { writeFileSync } from 'fs';
 import path from 'path';
-import WorkerS3 from '../src/workers3';
+import WorkerS3 from '../src/worker-s3';
 
 writeFileSync(
   path.join(__dirname, '../pplns/worker.json'),
