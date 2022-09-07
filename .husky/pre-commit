@@ -4,4 +4,4 @@
 yarn lint
 yarn test
 
-yarn export-worker-def && git add pplns/*.json
+yarn export-worker-def && git add pplns_workers/*.json
