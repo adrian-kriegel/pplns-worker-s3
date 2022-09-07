@@ -9,7 +9,7 @@ import { Type } from '@sinclair/typebox';
 export default class WorkerS3
 implements WorkerWrite
 {
-  key = 'aws_s3_emit';
+  _id = 'aws_s3_emit';
 
   title = 'AWS S3';
 
