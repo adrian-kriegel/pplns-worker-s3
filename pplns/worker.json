@@ -1,0 +1,24 @@
+{
+  "_id": "aws_s3_emit",
+  "title": "AWS S3",
+  "description": "Emit files from AWS S3 as outputs.",
+  "inputs": {},
+  "outputs": {
+    "file": {
+      "type": "object",
+      "properties": {
+        "s3Url": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "s3Url"
+      ]
+    }
+  },
+  "params": {
+    "bucket": {
+      "type": "string"
+    }
+  }
+}

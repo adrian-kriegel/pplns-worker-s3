@@ -10,7 +10,8 @@
   "scripts": {
     "lint": "eslint --fix --ext .ts ./src ./test",
     "build": "tsc",
-    "test": "jest"
+    "test": "jest",
+    "export-worker-def": "ts-node scripts/export-worker-def.ts"
   },
   "dependencies": {
     "@sinclair/typebox": "^0.24.28",
@@ -27,6 +28,7 @@
     "@types/node": "^18.7.5",
     "@unologin/eslint-config": "^1.1.0",
     "eslint": "7",
+    "husky": "^8.0.1",
     "mock-aws-s3": "^4.0.2",
     "ts-jest": "^28.0.8",
     "ts-node": "^10.9.1",
