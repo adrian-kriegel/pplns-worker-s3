@@ -8,7 +8,7 @@ import NodeS3 from './nodeS3';
 
 const pipes = new PipelineApi(
   {
-    baseURL: process.env.PPLN_API,
+    baseURL: process.env.PPLNS_API,
   },
 );
 
@@ -23,6 +23,8 @@ export async function run()
     process.env.PPLNS_NODE_ID as string,
     pipes,
   );
+
+  await node.load();
 
   return node.run();
 }

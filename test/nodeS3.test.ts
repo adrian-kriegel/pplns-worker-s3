@@ -22,14 +22,11 @@ class MockPipes extends PipelineApi
     super({});
 
     (this as any).client = {
-      get: () => Promise.resolve<{ data: Pick<NodeRead, 'params'> }>(
+      get: () => Promise.resolve<Pick<NodeRead, 'params'>>(
         {
-          data:
+          params: 
           {
-            params: 
-            {
-              bucket: 'source-bucket',
-            },
+            bucket: 'source-bucket',
           },
         },
       ),

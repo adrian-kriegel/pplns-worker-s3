@@ -7,11 +7,13 @@ import type WorkerS3 from './worker-s3';
 
 import { PipelineNode } from '@pplns/node-sdk';
 import { listAllObjects } from './s3-util';
+import { DataItemQuery } from '@pplns/schemas';
 
 const s3 = new S3(
   {
     accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID as string,
     secretAccessKey: process.env.AWS_S3_ACCESS_KEY as string,
+    region: process.env.AWS_S3_REGION,
   },
 );
 
@@ -33,11 +35,11 @@ export default class NodeS3
    * @param key s3 object key
    * @returns Promise
    */
-  emitS3Object(
+  async emitS3Object(
     key : string,
   )
   {
-    return this.emit(
+    const res = await this.emit(
       {
         done: true,
         outputChannel: 'file',
@@ -47,16 +49,32 @@ export default class NodeS3
         data: [{ s3Url: this.getUrl(key) }],
       },
     );
+
+    return res;
   }
 
   /** @returns Promise<void> */
-  run()
+  async run()
   {
+    const query : DataItemQuery = 
+    {
+      nodeId: this.nodeId,
+      sort: { createdAt: -1 },
+      limit: 1,
+      taskId: this.get().taskId,
+    };
+
+    const resp = await this.pipes.getDataItems(
+      query,
+    );
+
+    const lastEmitted = resp?.results?.[0];
+
     const bucket = this.param('bucket');
 
     return listAllObjects(
       s3, 
-      { Bucket: bucket },
+      { Bucket: bucket, StartAfter: lastEmitted?.flowId },
       (obj) => obj.Key && this.emitS3Object(obj.Key),
     );
   }
