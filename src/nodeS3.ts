@@ -43,10 +43,10 @@ export default class NodeS3
       {
         done: true,
         outputChannel: 'file',
-        // TODO: find out if objects can be efficiently found using their etag
-        // if so, use etag as flowId instead
         flowId: key,
         data: [{ s3Url: this.getUrl(key) }],
+        // s3 node is always a source node and takes no inputs
+        consumptionId: null,
       },
     );
 
