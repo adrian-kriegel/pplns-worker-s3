@@ -5,7 +5,7 @@ import { S3 } from 'aws-sdk';
 
 import type WorkerS3 from './worker-s3';
 
-import { PipelineNode } from '@pplns/node-sdk';
+import { ApiError, PipelineNode } from '@pplns/node-sdk';
 import { listAllObjects } from './s3-util';
 import { DataItemQuery } from '@pplns/schemas';
 
@@ -39,18 +39,35 @@ export default class NodeS3
     key : string,
   )
   {
-    const res = await this.emit(
-      {
-        done: true,
-        outputChannel: 'file',
-        flowId: key,
-        data: [{ s3Url: this.getUrl(key) }],
-        // s3 node is always a source node and takes no inputs
-        consumptionId: null,
-      },
-    );
+    console.log(key);
+    try 
+    {
+      const res = await this.emit(
+        {
+          done: true,
+          outputChannel: 'file',
+          flowId: key,
+          data: [{ s3Url: this.getUrl(key) }],
+          // s3 node is always a source node and takes no inputs
+          consumptionId: null,
+        },
+      );
 
-    return res;
+      return res;
+    }
+    catch (e)
+    {
+      // 409 means that the item has already been submitted
+      // this can simply be ignored
+      if (e instanceof ApiError && e.code == 409)
+      {
+        return (e.data as any)?.item;
+      }
+      else 
+      {
+        throw e;
+      }
+    }
   }
 
   /** @returns Promise<void> */
@@ -67,14 +84,14 @@ export default class NodeS3
     const resp = await this.pipes.getDataItems(
       query,
     );
-
+    console.log(resp);
     const lastEmitted = resp?.results?.[0];
 
     const bucket = this.param('bucket');
 
     return listAllObjects(
       s3, 
-      { Bucket: bucket, StartAfter: lastEmitted?.flowId },
+      { Bucket: bucket, StartAfter: lastEmitted?.flowId, MaxKeys: 10 },
       (obj) => obj.Key && this.emitS3Object(obj.Key),
     );
   }

@@ -19,7 +19,7 @@ class MockPipes extends PipelineApi
   /** */
   constructor()
   {
-    super({});
+    super({ apiKey: '' });
 
     (this as any).client = {
       get: () => Promise.resolve<Pick<NodeRead, 'params'>>(
